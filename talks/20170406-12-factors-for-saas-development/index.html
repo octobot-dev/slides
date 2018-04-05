@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>12 Factors for SaaS development</title>
+
+		<meta name="description" content="Mejores prácticas para escribir software moderno">
+		<meta name="author" content="Juan Saavedra">
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="/css/reveal.css">
+		<link rel="stylesheet" href="/css/theme/octobot.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="/lib/css/zenburn.css">
+
+		<!-- Fontawesome with SVG+JS -->
+		<script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? '/css/print/pdf.css' : '/css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>12 Factor Apps</h1>
+					<h3>Una guía general para el desarrollo SaaS</h3>
+					<p>
+						<small><a href="mailto:jsaavedra@octobot.io">Juan Saavedra</a> 06/04/2018</small>
+					</p>
+					<img class="plain" src="/images/full_pulpo.png" style="max-height: 170px;">
+				</section>
+
+				<section>
+					<h2>Intro</h2>
+					<h3>This is not a tutorial <i class="fas fa-exclamation-triangle"></i></h3>
+					<p>
+						Lineamientos generales y fundamentos de cómo construir buen software SaaS.
+					</p>
+					<aside class="notes">
+						Es muy difícil tener una receta a prueba de todo. Apelamos al buen equipo, su
+						capacidad de abstracción y cómo instanciar estos lineamientos en
+						diferentes situaciones.
+						Usamos el término SaaS en un sentido genérico, INEFOP no es un SaaS comercial pero cuenta.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Agenda</h2>
+					<ul>
+						<li>Historia y Motivación</li>
+						<li>12 Factors</li>
+						<li>Otros factores</li>
+					</ul>
+					<aside class="notes">
+						Hoy no van a ver nada específico para hacer, sino lineamientos.
+					</aside>
+				</section>
+
+				<section>
+					<section>
+						<h2>Historia y Motivación</h2>
+						<p><i class="fas fa-history"></i> <i>Érase una vez...</i></p>
+						<aside class="notes">
+							Vemos la historia para entender porqué esto es importante, en cuanto cambia
+							la forma que se construye software de lo que aprendemos habitualmente.
+						</aside>
+					</section>
+					<section>
+						<ul>
+							<li class="fragment"><i class="far fa-building"></i> Mainframe apps</li>
+							<li class="fragment"><i class="fas fa-server"></i> Server/Desktop apps</li>
+							<li class="fragment"><i class="fab fa-internet-explorer"></i> Single-Tenant Web Apps</li>
+						</ul>
+						<aside class="notes">
+							Server-desktop tiene muchos sabores. Thin clients, DB como backend.
+							Luego webapps single-tenants, usualmente que se ejecutaban en el servidor
+							que el cliente dedicaba a esto.
+						</aside>
+					</section>
+					<section>
+						<h3>Pero en el 2006...</h3>
+						<i class="fragment fab fa-aws fa-5x"></i>
+						<aside class="notes">
+							El hw se abarató, la virtualización se hizo buena y se cambió el paradigma a SaaS.
+							Concentrate en lo que sos mejor, más barato, más fácil de mantener.
+							De todo esto, surgen buenas prácticas...
+						</aside>
+					</section>
+					<section>
+						<p>
+							Sin embargo, el software tenía que cambiar.
+						</p>
+						<ul >
+							<li class="fragment">No más Conexión/Sesión</li>
+							<li class="fragment">Escalabilidad horizontal(!)</li>
+							<li class="fragment">Todo multi-host(!)</li>
+						</ul>
+					</section>
+
+				</section>
+
+				<section>
+					<h3>The 12-Factor App</h3>
+					<p>
+						<a href="https://12factor.net/">https://12factor.net/</a>
+					</p>
+					<img class="plain" src="images/12factorlogo.png" />
+					<aside class="notes">
+						Guía de buenas prácticas basadas en experiencia.
+					</aside>
+				</section>
+
+				<section>
+					<section>
+						<h1>I</h1>
+						<h2>Codebase</h2>
+						<p>One codebase tracked in revision control, many deploys</p>
+					</section>
+					<section>
+						<p>
+							¿Qué implica?
+						</p>
+						<ul >
+							<li class="fragment">Usar control de cambios</li>
+							<li class="fragment">El código es el mismo para todos los deploys</li>
+							<li class="fragment">No se repite código entre diferentes partes de la app</li>
+						</ul>
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<img class="fragment plain" src="https://media.giphy.com/media/xHMIDAy1qkzNS/giphy.gif" />
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<ul >
+							<li class="fragment"><i class="far fa-check-circle success"></i> Usamos git</li>
+							<li class="fragment"><i class="far fa-check-circle success"></i> El código es el mismo para todos los deploys, salvo dev</li>
+							<li class="fragment"><i class="far fa-check-circle success"></i> No repetimos código entre diferentes partes de la app*</li>
+						</ul>
+						<aside class="notes">
+						  El código es casi casi el mismo, cambian los settings y en algunos casos adicionales como el storage backend.
+							Ahora con LocalStack (still in beta) puede que esto mejore.
+							En algunos casos se repite código de frontend. CSS, maquetado. Habitualmente era suficientemente marginal como para
+							no preocuparse. Esto cambió ahora con los componentes y estamos viendo de manejarlo (ln -s o librería).
+						</aside>
+					</section>
+
+				</section>
+
+				<section>
+					<section>
+						<h1>II</h1>
+						<h2>Dependencies</h2>
+						<p>Explicitly declare and isolate dependencies</p>
+					</section>
+					<section>
+						<p>
+							¿Qué implica?
+						</p>
+						<ul >
+							<li class="fragment">Declaración explícita de todas las dependencias</li>
+							<li class="fragment">No usar librerías globales del sistema</li>
+							<li class="fragment">Usar un sistema de dependencias</li>
+							<li class="fragment">Aislación de ambientes para evitar <i>leaks</i>.</li>
+						</ul>
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<img class="fragment plain" src="https://media.giphy.com/media/JQQwgVUMDIyAM/giphy.gif" />
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<ul >
+							<li class="fragment"><i class="far fa-check-circle success"></i> Todos los proyectos tienen sus dependencias declaradas en archivos versionados.</li>
+							<li class="fragment"><i class="far fa-check-circle success"></i> No hay instrucciones <i>fuera de banda</i> específicas para correr un sistema.</li>
+							<li class="fragment"><i class="far fa-check-circle success"></i> Se utilizan pip, npm y bower de acuerdo a la tecnología.</li>
+							<li class="fragment"><i class="far fa-check-circle success"></i> Aislamos ambientes con Docker.</li>
+						</ul>
+						<p class="fragment">
+							El gran debe son las dependencias frontend y las versiones. <i class="far fa-times-circle error"></i>
+						</p>
+						<aside class="notes">
+						  Esto está bien trabajado. Tanto con npm, bower, pip, gems, etc.
+							La aislación se lograba con nodeenv y virtualenv en el pasado. Ahora con Docker.
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h1>III</h1>
+						<h2>Config</h2>
+						<p>Store config in the environment</p>
+						<i>An app’s config is everything that is likely to vary between deploys</i>
+					</section>
+					<section>
+						<p>
+							¿Qué implica?
+						</p>
+						<ul >
+							<li class="fragment">La configuración del sistema debe levantarse desde env vars</li>
+							<li class="fragment">No agrupar settings en dev/prod/staging/test.</li>
+						</ul>
+						<aside class="notes">
+						  Porqué? Puedo cambiar comportamiento en runtime y tengo el mismo código en todos los ambientes.
+						</aside>
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<img class="fragment plain" src="https://media.giphy.com/media/PxVU1MvRUs3WE/giphy.gif" />
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<ul >
+							<li class="fragment"><i class="far fa-check-circle success"></i> La configuración se levanta desde env vars</li>
+							<li class="fragment"><i class="far fa-check-circle success"></i> No agrupamos settings (no, no estoy mintiendo)</li>
+						</ul>
+						<p class="fragment">
+							Sin embargo pueden que queden proyectos legacy que no cumplan esto. A su vez, algunos tienen settings poco
+							importantes que están remachadas en <code>settings_server.py</code> en muchos casos. <i class="far fa-times-circle error"></i>
+						</p>
+						<aside class="notes">
+						  Esto puede mejorar, sin embargo está trabajado con criterio.
+							Hay valores remachados que en nuestro caso están bien puesto que son los de Docker.
+							Se agrupan settings de servidores, which is good.
+							¿Tiene sentido que el backend storage sea una variable de ambiente si requiere cambiar código?
+						</aside>
+					</section>
+
+				</section>
+
+				<section>
+					<section>
+						<h1>IV</h1>
+						<h2>Backing Services</h2>
+						<p>Treat backing services as attached resources</p>
+					</section>
+					<section>
+						<img class="plain" src="images/WAT.jpg" />
+					</section>
+					<section>
+						<p>
+							¿Qué implica?
+						</p>
+						<ul >
+							<li class="fragment">Todo servicio (DB, API) que utilice tu sistema es intercambiable. </li>
+						</ul>
+						<aside class="notes">
+						  Porqué? Tengo un sistema flexible e interfaces bien claras.
+						</aside>
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<ul >
+							<li class="fragment"><i class="far fa-check-circle success"></i> Esto funciona bien y de hecho hemos intercambiado servicios.</li>
+						</ul>
+						<aside class="notes">
+							Nunca fue un problema, siempre hemos tenido buen decoupling.
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h1>V</h1>
+						<h2>Build, release, run</h2>
+						<p>Strictly separate build and run stages</p>
+					</section>
+					<section>
+						<p>
+							Dejemos en claro que:
+						</p>
+						<ul >
+							<li>The build stage is a transform which converts a code repo into an executable bundle known as a build.</li>
+							<li>The release stage takes the build produced by the build stage and combines it with the deploy’s current config.</li>
+							<li>The run stage runs the app in the execution environment.</li>
+						</ul>
+					</section>
+					<section>
+						<p>
+							¿Qué implica?
+						</p>
+						<ul >
+							<li class="fragment">No puedo cambiar código en runtime</li>
+							<li class="fragment">Los releases tienen un ID único</li>
+							<li class="fragment">Hacer un release/run es una tarea automática.</li>
+						</ul>
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+
+						<img class="fragment plain" src="https://media.giphy.com/media/vX9WcCiWwUF7G/giphy.gif" />
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<ul >
+							<li class="fragment"><i class="far fa-check-circle success"></i> No podemos cambiar código en runtime</li>
+							<li class="fragment"><i class="far fa-times-circle error"></i> Los releases no siempre tienen un ID único</li>
+							<li class="fragment"><i class="far fa-times-circle error"></i> Lejos de automática</li>
+						</ul>
+						<aside class="notes">
+							Esta es un área que debemos mejorar mucho.
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h1>VI</h1>
+						<h2>Processes</h2>
+						<p>Execute the app as one or more stateless processes</p>
+					</section>
+					<section>
+						<p>
+							¿Qué implica?
+						</p>
+						<ul >
+							<li class="fragment">Todo proceso es <i>stateless</i>.</li>
+							<li class="fragment">Los procesos no comparten nada entre si salvo a través de servicios de persistencia.</li>
+						</ul>
+						<aside class="notes">
+						  Porqué? Puedo hacer teardown y setup rápidamente.
+							Stateless = No importa lo que haya hecho antes. Es lo mismo que atienda un pedido
+							un proceso que atendió mil pedidos que uno que recién arranca.
+							En algunos casos cuesta más hacer que los procesos sean stateless, pero es importante.
+							Ej. tengo un formulario que deben seleccionar en varios pasos, debo reenviar toda la información de la transacción al final?
+							Yes! Pareciera que está mal, pero es lo esperado si el servidor que atiende el último paso es diferente a los
+							anteriores.
+						</aside>
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<img class="fragment plain" src="https://media.giphy.com/media/hfYnqeqVeO4pO/giphy.gif" />
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<ul >
+							<li class="fragment"><i class="far fa-check-circle success"></i> Nuestros sistemas son stateless por naturaleza*.</li>
+							<li class="fragment"><i class="far fa-check-circle success"></i> Los procesos solamente comparten información a través de DB o MQ.</li>
+						</ul>
+						<aside class="notes">
+							INEFOP y su formulario de registro es el único que no es stateless, pero se está corrigiendo. Y en el fondo
+							siempre supimos que está mal
+
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h1>VII</h1>
+						<h2>Port Binding</h2>
+						<p>Export services via port binding</p>
+
+					</section>
+					<section>
+						<p>
+							¿Qué implica?
+						</p>
+						<ul >
+							<li class="fragment">Todo servicio debe exponerse a través de un puerto.</li>
+							<li class="fragment">La aplicación es autocontenida (no se corre sobre un servidor de aplicación por fuera).</li>
+						</ul>
+					</section>
+
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<img class="fragment plain" src="https://media.giphy.com/media/urH7OHTkPAqEo/giphy.gif" />
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<ul >
+							<li class="fragment"><i class="far fa-check-circle success"></i> Casi todos los proyectos actuales cumplen con esto.</li>
+							<li class="fragment"><i class="far fa-check-circle success"></i> No lo tenemos en código, pero en el ensamblado (<code>docker build</code>) se incorpora.</li>
+						</ul>
+						<aside class="notes">
+							La AMSJ no tiene esto en alguna de sus instancias.
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h1>VIII</h1>
+						<h2>Concurrency</h2>
+						<p>Scale out via the process model</p>
+					</section>
+					<section>
+						<p>
+							¿Qué implica?
+						</p>
+						<ul >
+							<li class="fragment">La aplicación debe poder distribuirse en varios equipos.</li>
+							<li class="fragment">No es necesario que todos los equipos corran los mismos procesos.</li>
+						</ul>
+						<aside class="notes">
+							¿Porqué esto? Mucho hardware fácil de instanciar y balancear.
+						</aside>
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<img class="fragment plain" src="https://media.giphy.com/media/26xBT8PxeCIvf7Ous/giphy.gif" />
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<ul>
+							<li class="fragment"><i class="far fa-check-circle success"></i> Decente. No lo hemos implementado, pero no hay limitaciones de arquitectura en ningún caso.</li>
+							<li class="fragment"><i class="far fa-check-circle success"></i> No es necesario que todos los servidores .</li>
+						</ul>
+						<p class="fragment">
+							Deberíamos tener esto implementado, es fácil con las tecnologías que utilizamos. <i class="far fa-times-circle error"></i>
+						</p>
+
+
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h1>IX</h1>
+						<h2>Disposability</h2>
+						<p>Maximize robustness with fast startup and graceful shutdown</p>
+					</section>
+					<section>
+						<p>
+							¿Qué implica?
+						</p>
+						<ul >
+							<li class="fragment">Tiempo de startup mínimo.</li>
+							<li class="fragment">Shutdown graceful de los procesos..</li>
+						</ul>
+						<aside class="notes">
+							¿Porqué esto? Para escalar rápidamente y ser más robustos. Monkeywrench de netflix.
+						</aside>
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<img class="fragment plain" src="https://media.giphy.com/media/1zSz5MVw4zKg0/giphy.gif" />
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<ul >
+							<li class="fragment"><i class="far fa-times-circle error"></i> Nunca nos hemos esforzado por minimizarlo.</li>
+							<li class="fragment"><i class="far fa-times-circle error"></i> No hay un manejo explícito del shutdown en casi ningún proyecto.</li>
+						</ul>
+						<p class="fragment">
+							En nuestro caso no es crítico, pero es algo bastante genérico de configurar y no lo estamos haciendo en ningún proyecto. <i class="far fa-times-circle error"></i>
+						</p>
+
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h1>X</h1>
+						<h2>Dev/Prod Parity</h2>
+						<p>Keep development, staging, and production as similar as possible</p>
+					</section>
+					<section>
+						<p>
+							¿Qué implica?
+						</p>
+						<ul >
+							<li class="fragment">Misma arquitectura.</li>
+							<li class="fragment">Mismos servicios.</li>
+						</ul>
+						<aside class="notes">
+							¿Porqué esto? Para evitar sorpresas. Se acuerdan de CORS?.
+						</aside>
+					</section>
+					<section>
+
+					<table>
+					  <tbody>
+							<tr>
+					    <th>
+					    </th><th>Traditional</th>
+					    <th>Twelve-factor</th>
+					  </tr>
+					  <tr>
+					    <th>Time between deploys</th>
+					    <td>Weeks</td>
+					    <td>Hours</td>
+					  </tr>
+					  <tr>
+					    <th>Code authors vs code deployers</th>
+					    <td>Different people</td>
+					    <td>Same people</td>
+					  </tr>
+					  <tr>
+					    <th>Dev vs production environments</th>
+					    <td>Divergent</td>
+					    <td>As similar as possible</td>
+					  </tr>
+					</tbody></table>
+
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<img class="fragment plain" src="https://media.giphy.com/media/l0HlLZiHatn0BLJde/giphy.gif" />
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<ul >
+							<li class="fragment"><i class="far fa-check-circle success"></i> Utilizando Docker Compose mantenemos un ambiente complejo similar a Prod y portable en Dev.</li>
+							<li class="fragment"><i class="far fa-check-circle success"></i> Los servicios (proxy, backend, tasks, db) son los mismos.</li>
+						</ul>
+					</section>
+					<section>
+
+						<p class="fragment">
+							Existen muchas veces diferencias, pero son razonables.
+							<ul>
+								<li>Servimos assets con <code>gulp serve</code> en lugar de NGINX.</li>
+								<li>Corremos el server incluído en Django</li>
+							</ul>
+							Deberíamos correr Django en uWSGI debug con autoreload.
+						</p>
+						<aside class="notes">
+							¿Porqué esto? Para evitar problemas al hacer deploy.
+							En otros lugares hay que especificar las librerías del SO (y su versión!).
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h1>XI</h1>
+						<h2>Logs</h2>
+						<p>Treate logs as event streams</p>
+					</section>
+					<section>
+						<p>
+							¿Qué implica?
+						</p>
+						<ul >
+							<li class="fragment"><i>Logs in their raw form are typically a text format with one event per line. Logs have no fixed beginning or end, but flow continuously as long as the app is operating.</i></li>
+							<li class="fragment">No preocuparse por rutear el contendio, todo a stdout.</li>
+						</ul>
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+
+						<img class="fragment plain" src="https://media.giphy.com/media/3o6UBpHgaXFDNAuttm/giphy.gif" />
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<ul >
+							<li class="fragment"><i class="far fa-times-circle error"></i> Utilizando Docker Compose mantenemos un ambiente complejo similar a Prod y portable en Dev.</li>
+							<li class="fragment"><i class="far fa-times-circle error"></i> Los servicios (proxy, backend, tasks, db) son los mismos.</li>
+						</ul>
+						<p class="fragment">
+							<b>Los logs y su manejo son un gran debe de nuestros productos.</b> No es muy malo, pero no es bueno.
+						</p>
+						<aside class="notes">
+							Los logs son vitales tanto para depurar como para entender el funcionamiento del sistema.
+							Se viene un workshop de logs.
+
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h1>XII</h1>
+						<h2>Admin processes</h2>
+						<p>Run admin/management tasks as one-off processes</p>
+					</section>
+
+					<section>
+						<p>
+							¿Qué implica?
+						</p>
+						<ul >
+							<li class="fragment">Correr comandos administrativos por dentro del código de la app.</li>
+							<li class="fragment">Tareas largas como tasks.</li>
+						</ul>
+						<aside class="notes">
+							¿Porqué esto? Evitar discrepancias en comandos standalone.
+						</aside>
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<img class="fragment plain" src="https://media.giphy.com/media/oAkNXcL4QOag8/giphy.gif" />
+					</section>
+					<section>
+						<p>
+							¿Cómo estamos?
+						</p>
+						<ul >
+							<li class="fragment"><i class="far fa-check-circle success"></i> Nuestras soluciones incluyen esto como management commands de Django.</li>
+							<li class="fragment"><i class="far fa-check-circle success"></i> Las tareas largas o pesadas las sacamos a tasks que se manejan a través de Celery y corren en la misma codebase.</li>
+						</ul>
+						<aside class="notes">
+							¿Porqué esto? No migraciones SQL por fuera, por ejemplo.
+							Las tecnologías y la arquitectura que trabajamos tiene esto desde el vamos.
+							Faltaría un manejo más inteligente de las tasks y el manejo de errores por ejemplo.
+						</aside>
+					</section>
+					<section>
+						<section>
+							<h1>RFC?</h1>
+							<h2>Auth per request</h2>
+							<p>Each request should carry an auth token</p>
+						</section>
+
+						<section>
+							<p>
+								¿Qué implica?
+							</p>
+							<ul >
+								<li class="fragment">Todos los requests tienen un header con el token de autorización.</li>
+								<li class="fragment">Autorización delegada.</li>
+							</ul>
+							<aside class="notes">
+								¿Porqué esto? Escalar.
+							</aside>
+						</section>
+						<section>
+							<p>
+								¿Cómo estamos?
+							</p>
+							<ul >
+								<li class="fragment"><i class="far fa-check-circle success"></i> Casi todas nuestras soluciones hoy en día funcionan con esto.</li>
+								<li class="fragment"><i class="far fa-check-circle success"></i> Algunas lo delegan en OpenID otras en el propio proyecto de Django.</li>
+							</ul>
+						</section>
+					<section>
+	          <h1>Preguntas?</h1>
+	        </section>
+					<section>
+	          <h1>Gracias!</h1>
+	        </section>
+
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="/lib/js/head.min.js"></script>
+		<script src="/js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: '/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: '/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: '/plugin/search/search.js', async: true },
+					{ src: '/plugin/zoom-js/zoom.js', async: true },
+					{ src: '/plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
