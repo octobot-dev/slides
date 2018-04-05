@@ -313,3 +313,11 @@ body {
 
 .reveal small code {
   vertical-align: baseline; }
+
+.error {
+  color: #ff0259;
+}
+
+.success {
+  color: #11B259;
+}
