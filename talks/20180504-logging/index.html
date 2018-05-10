@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Logging!</title>
+
+		<meta name="description" content="Logging!">
+		<meta name="author" content="Juan Saavedra">
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="/css/reveal.css">
+		<link rel="stylesheet" href="/css/theme/octobot.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="/lib/css/zenburn.css">
+
+		<!-- Fontawesome with SVG+JS -->
+		<script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? '/css/print/pdf.css' : '/css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Logging!</h1>
+					<h3><i>-¡¿Cómo que no está logueado?!</i></h3>
+					<p>
+						<small>By <a href="mailto:jsaavedra@octobot.io">Juan Saavedra</a> </small>
+					</p>
+					<img class="plain" src="/images/full_pulpo.png" style="max-height: 170px;">
+
+				</section>
+				<section>
+					<h2>Agenda</h2>
+					<ol>
+						<li>¿Porqué logs? </li>
+						<li>Conceptos generales </li>
+						<li>Aspectos tecnológicos </li>
+						<li>Aspectos de seguridad </li>
+						<li>Hands on: buenas prácticas </li>
+					</ol>
+					<aside class="notes">
+						Vamos a hablar de logs, la tecnología, conceptos generales y cómo escribir buenos logs.
+						A destacar la importancia del log aparece cuando menos se lo espera y más se lo precisa.
+						Que registrar y cómo está fuertemente basado en la experiencia, pero el marco nos ayuda a
+						tener claro que buscamos.
+					</aside>
+				</section>
+
+				<!-- Example of nested vertical slides -->
+				<section>
+					<section>
+						<h2>¿Porqué logs?</h2>
+						<p>Los <i>logs</i> o registros nos permiten 3 cosas:</p>
+						<ul>
+							<li>Visualizar cómo se comporta un sistema </li>
+							<li>Identificar un problema pre-issue </li>
+							<li>Diagnosticar un issue post-mortem </li>
+							<li>Tener métricas de funcionamiento de un sistema</li>
+							<li>Evaluar incidencias de seguridad</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Visualizamos como se comporta un sistema</h2>
+						<pre><code>
+INFO | commonbytes.profiles | ... | Redirect for entityType TEACHER
+INFO | commonbytes.compass.api | ... | Requesting the following resource https://portals.ayt360.o...
+INFO | commonbytes.compass.api | ... | Compass connection OK
+INFO | commonbytes.profiles | ... | Succesfully activated teacher account ektapatelXWHEUF65T1.
+INFO | commonbytes.compass.api | ... | Posting to the following resource https://portals.ayt360.org/SchoolRoster/roster/teachers/
+INFO | commonbytes.compass.api | ... | Compass connection OK
+INFO | commonbytes.compass.api | ... | Suggest a more complete Clever integration. Missing classRefs field in the reply. This is not critical and I will continue.
+INFO | commonbytes.compass.api | ... | {'compassId': '6F5BE92B...th.org'}
+						</code></pre>
+						<aside class="notes">
+							Un buen log nos permite ver que está sucediendo en el sistema, cual es el flujo de la información, que componentes participan,
+							que cosas fuera de lo normal se encontraron, dónde hay problemas, etc.
+							Gran herramienta para hacer ingeniería reversa!
+						</aside>
+					</section>
+					<section>
+						<h2>Diagnosticamos un problema pre issue</h2>
+						<pre><code>
+10.2.2.5 - - [03/May/2018:20:09:15 +0000]
+"GET /%7B%7BbaseCtrl.loggedUser.avatar%20%7C%20avatarUrl%7D%7D HTTP/1.1"
+404 169
+"https://www.commonbytes.org/"
+"Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko"
+						</code></pre>
+						<aside class="notes">
+							Telemetría de problemas antes de que nos reporten. ¿Porqué estamos viendo un montón de 404
+							de assets?
+						</aside>
+					</section>
+					<section>
+						<h2>Diagnosticamos un issue post mortem</h2>
+						<pre><code>
+WARNING | 16:50:35 | save_in_mailchimp | Couldn't update millenial in mailchimp
+ERROR | 16:50:35 | save_in_mailchimp | API key Disabled: 63e889
+						</code></pre>
+						<aside class="notes">
+							Este es el uso al que más estamos acostumbrados. ¿Qué pasó?
+							¿Porqué no encontramos este problema nosotros?
+							¿Cambió algo?
+						</aside>
+					</section>
+					<section>
+						<h2>Tener métricas de funcionamiento de un sistema</h2>
+						<pre><code>
+172.31.15.80 - - [03/May/2018:16:56:51 +0000]
+"GET /cases/possible-locations/ HTTP/1.1"
+200 106 "https://jobs.zealpath.com/m/case/search"
+"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4)
+AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1 Safari/605.1.15"
+						</code></pre>
+						<aside class="notes">
+							Si cruncheamos los logs podemos tener información de accesos, tiempos de respuesta,
+							URLs más accedidas, navegadores más usados, IPs de origen, etc.
+						</aside>
+					</section>
+					<section>
+						<h2>Evaluar incidencias de seguridad</h2>
+						<pre><code>
+10.2.2.5 - [03/May/2018:17:16:04 +0000]
+"GET /wp-login.php HTTP/1.1" 404 169
+"-" "Mozilla/5.0
+(Windows NT 6.1; WOW64; rv:40.0)
+Gecko/20100101 Firefox/40.1"
+						</code></pre>
+						<aside class="notes">
+							¿Está bien el comportamiento que estamos viendo? ¿Es lo esperado?
+							¿Cómo nos están atacando o nos atacaron?
+						</aside>
+					</section>
+				</section>
+
+
+				<section>
+					<h2>Conceptos generales</h2>
+					<p>En casi todos los frameworks se repiten conceptos y su funcionamiento</p>
+					<ul>
+						<li>Loggers</li>
+						<li>Levels</li>
+						<li>Handlers</li>
+					</ul>
+					<aside class="notes">
+						Trabajamos con loggers django, js, node, y otros. Todos con
+						los mismos conceptos (JS?)
+					</aside>
+				</section>
+
+				<section>
+				<section>
+					<h2>Loggers</h2>
+				</section>
+				<section>
+					<p>A donde enviamos la información</p>
+					<pre><code>
+logger = logging.getLogger('backend.ciudadanos')
+logger.info("El usuario X actualizó su email a : xxxx")
+					</code></pre>
+				</section>
+				<section>
+					<h3>Named Loggers</h3>
+					<p>Nos permite dar orden y jerarquía a la información que registramos.</p>
+					<pre><code>
+loggerCiudadanos = logging.getLogger('backend.ciudadanos')
+loggerAgentes = logging.getLogger('backend.agentes')
+					</code></pre>
+				</section>
+				<section>
+					<h3>Jerarquías</h3>
+					<p>Cómo son los siguientes parentezcos?</p>
+					<pre><code>
+loggerA = logging.getLogger('backend.ciudadanos')
+loggerB = logging.getLogger('backend.agentes')
+loggerC = logging.getLogger('backend.agentes.api')
+loggerD = logging.getLogger('backend')
+					</code></pre>
+				</section>
+				</section>
+
+				<section>
+				<section>
+					<h2>Levels</h2>
+				</section>
+				<section>
+					<h3>Uno de los conceptos más difíciles de aplicar</h3>
+					<p>Le indican al sistema la gravedad de lo que se está registrando.</p>
+					<p>Es útil para poder actuar de forma diferente.</p>
+				</section>
+				<section>
+					<h3>Niveles clásicos</h3>
+					<ol>
+						<li><i>Trace</i></li>
+						<li>Debug</li>
+						<li>Info</li>
+						<li>Warn</li>
+						<li>Error</li>
+						<li>Fatal</li>
+					</ol>
+					<aside class="notes">
+						Que den ejemplos de lo que les parece que es cada uno.
+						Trace no lo usamos.
+						Trace - print("hola");print("hola2");
+						Debug - print(variable)
+						Info - print("arranco")
+						Warn - print("Porqué hay dos punteros?")
+						Error - print("Sin el atributo fecha de nacimiento no puedo calcular la edad, abort")
+						Fatal - printt("no compila")
+					</aside>
+				</section>
+				<section>
+					<h3>De print a logger.___</h3>
+					<pre><code>
+int calcularEdad(int ci){
+	...
+	print("comienza programa");
+	print("No existe la ci!")
+	print("usuario con edad negativa!")
+	print(anio)
+	print("no hay conexión con la DB");
+	...
+}
+					</code></pre>
+				</section>
+				<section>
+					<h3>De print a loger.___</h3>
+					<pre><code>
+int calcularEdad(int ci){
+	...
+	logger.INFO("comienza programa");
+	logger.ERROR("No existe la ci!");
+	logger.WARN("usuario con edad negativa!");
+	logger.DEBUG("Anio nacimiento", anio);
+	logger.FATAL("no hay conexión con la DB");
+	...
+}
+					</code></pre>
+				</section>
+
+				</section>
+
+				<section>
+				<section>
+					<h2>Handlers</h2>
+				</section>
+				<section>
+					<h3>Los resumideros</h3>
+					<p>
+						Los handlers van a recibir los flujos de los loggers que tengan configurados,
+						para registrarlos en el medio que poseen con el formato
+						que tengan configurado y filtrando lo que no les es relevante.
+					</p>
+					<aside class="notes">
+						Mecionar filtros.
+						Podemos configurar handlers por logger!
+					</aside>
+				</section>
+				<section>
+					<h3>Ejemplos</h3>
+					<ol>
+						<li>File</li>
+						<li>DB</li>
+						<li>Stream/stdout</li>
+						<li>Email :/ </li>
+						<li>SMS :( </li>
+					</ol>
+					<aside class="notes">
+						Podemos configurar handlers por logger!
+					</aside>
+				</section>
+				<section>
+					<h3>Ejemplo de configuración de handlers</h3>
+					<pre><code>
+'handlers': {
+  'mail_admins': {
+    'level': 'ERROR',
+    'class': 'django.utils.log.AdminEmailHandler',
+    'email_backend': 'django.core.mail.backends.smtp.EmailBackend'
+  },
+  'mail_devs': {
+    'level': 'WARN',
+    'class': 'django.utils.log.EmailHandler',
+    'address': 'logs@octobot.io',
+    'email_backend': 'django.core.mail.backends.smtp.EmailBackend'
+  },
+  'console': {
+    'level': 'INFO',
+    'class': 'logging.StreamHandler',
+    'formatter': 'verbose'
+  }
+},
+					</code></pre>
+				</section>
+				<section>
+					<h3>Ejemplo de configuración de loggers-handlers</h3>
+					<pre><code>
+'backend': {
+    'handlers': ['console', 'mail_admins'],
+    'level': 'INFO',
+    'propagate': True,
+},
+'backend.api_delicada': {
+    'handlers': ['console', 'mail_devs'],
+    'level': 'INFO',
+    'propagate': True,
+},
+'django': {
+    'handlers': ['console', 'mail_admins'],
+    'level': 'INFO',
+    'propagate': True,
+},
+					</code></pre>
+				</section>
+
+
+				</section>
+
+				<section>
+					<section>
+						<h2>Aspectos tecnológicos</h2>
+					</section>
+					<section>
+						<h3>¿Hay algo más allá de no ser tan cerdos printeando?</h3>
+					</section>
+					<section>
+						<h2>No bloqueante</h2>
+						<p>Los mecanismos de logging son no bloqueantes.</p>
+						<p><b>print/send es una operación de IO!</b></p>
+					</section>
+					<section>
+						<h2>print/send es una operación de IO!</h2>
+					</section>
+					<section>
+						<h2>Concurrencia</h2>
+						<p>Los loggers son thread safe.</p>
+					</section>
+					<section>
+						<h2>Manejo de errores y operaciones comunes</h2>
+						<p>No space left on device</p>
+						<p>Rotate</p>
+						<p>Manejo de fechas y formateo</p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Aspectos de seguridad</h2>
+					</section>
+					<section>
+						<h2>Los logs tienen información sensible!</h2>
+						<p>Cuidado que logueamos y cómo!</p>
+					</section>
+					<section>
+						<h2>Paco's LoT</h2>
+						<p>A archivo/syslog solo puede entrar el operador que igual puede entrar a la db...</p>
+					</section>
+					<section>
+						<h2>Rule of Thumb</h2>
+						<p>En nuestro mundo devopish, verificar que lo que logueamos no se envía por mail.</p>
+					</section>
+				</section>
+
+				<section>
+				<section>
+					<h2>Hands on!</h2>
+				</section>
+				<section>
+<pre><code style="max-height: none;">
+@api_view(['POST'])
+def share_board(request):
+  if request.is_valid:
+    try:
+      hm = Employer.objects.get(user=request.user)
+      case = Case.objects.get(id=request.data.get("case_id"))
+      logger.___("HM is ", hm.name)
+      logger.___("Case is ", case.id)
+      if case.owner.user == hm.user:
+        case.share_case_with(request.data.get("email"))
+        return Response(status=200, data=None)
+      else:
+        logger.____("HM tried to share Case from other")
+        return Response(status=401, data=request.data)
+    except DoesNotExist as e:
+      logger.____("Frontend request for data that does not exist!")
+      return HttpResponseServerError('Cannot share case')
+    except Exception as e:
+      logger.____("Something went very wrong while sharing case XX")
+      return HttpResponseServerError('Cannot share case')
+  else:
+    logger.____("Invalid request while sharing board XX")
+    return Response(status=401, data=request.data)
+</code></pre>
+				</section>
+				<section>
+<pre><code style="max-height: none;">
+@api_view(['POST'])
+def share_board(request):
+  if request.is_valid:
+    try:
+      hm = Employer.objects.get(user=request.user)
+      case = Case.objects.get(id=request.data.get("case_id"))
+      logger.DEBUG("HM is ", hm.name)
+      logger.DEBUG("Case is ", case.id)
+      if case.owner.user == hm.user:
+        case.share_case_with(request.data.get("email"))
+        return Response(status=200, data=None)
+      else:
+        logger.WARN("HM tried to share Case from other")
+        return Response(status=401, data=request.data)
+    except DoesNotExist as e:
+      # WARN may be also good
+      logger.ERROR("Frontend request for data that does not exist!")
+      return HttpResponseServerError('Cannot share case')
+    except Exception as e:
+      logger.ERROR("Something went very wrong while sharing case XX")
+      return HttpResponseServerError('Cannot share case')
+  else:
+    logger.INFO("Invalid request while sharing board XX")
+    return Response(status=401, data=request.data)
+</code></pre>
+				</section>
+				</section>
+				<section>
+					<h1>Preguntas?</h1>
+				</section>
+				<section>
+					<h1>Gracias!</h1>
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="/lib/js/head.min.js"></script>
+		<script src="/js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: '/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: '/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: '/plugin/search/search.js', async: true },
+					{ src: '/plugin/zoom-js/zoom.js', async: true },
+					{ src: '/plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
